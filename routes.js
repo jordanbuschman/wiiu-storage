@@ -1,15 +1,21 @@
-var express  = require('express');
 var passport = require('passport');
-
+var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
 router.get('/', function(req, res) {
-    res.render('index', {title: 'Wii-U', what: 'best'});
+    res.render('index', {
+        title: 'Wii-U',
+        sessionUser: req.user
+    });
 });
 
 router.get('/login', function(req, res) {
     res.render('login', {title: 'Wii-U - Login'});
+});
+
+router.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
 });
 
 router.get('/u/:user', isLoggedIn, function(req, res) {
@@ -35,7 +41,7 @@ router.get('/public', function(req, res) {
 router.get('/public/:file', function(req, res) {
     res.render('publicItem', {title: 'Wii-U - ' + req.params.file});
 });
-
+    
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated())
         return next();
