@@ -3,10 +3,14 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res) {
-    res.render('index', {
+    res.render('public', {
         title: 'Wii-U',
         sessionUser: req.user
     });
+});
+
+router.get('/:file', function(req, res) {
+    res.render('publicItem', {title: 'Wii-U - ' + req.params.file});
 });
 
 router.get('/login', function(req, res) {
@@ -32,14 +36,6 @@ router.get('/u/:user/:file', isLoggedIn, function(req, res) {
         sessionUser: req.user,
         user: req.param.user
     }); 
-});
-
-router.get('/public', function(req, res) {
-    res.render('public', {title: 'Wii-U - Public Files'});
-});
-
-router.get('/public/:file', function(req, res) {
-    res.render('publicItem', {title: 'Wii-U - ' + req.params.file});
 });
     
 function isLoggedIn(req, res, next) {
