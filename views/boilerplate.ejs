@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title><%=title%></title>
+        <% if (this.title) { %>
+            <title><%=title%></title>
+        <% } else { %>
+            <title>Wii-U</title>
+        <% } %>
+
         <%-scripts%>
         <%-stylesheets%>
     </head>
