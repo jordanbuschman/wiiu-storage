@@ -13,7 +13,19 @@ router.get('/public', function(req, res) {
             res.json({'ERROR' : e });
         }
         else {
-            res.json({ 'Contents' : data.Body.ListBucketResult.Contents });
+            var contents = data.Body.ListBucketResult.Contents;
+            var trimmedContents = [];
+            contents.forEach(function(listing, index) {
+                if (index != 0) {
+                    trimmedContents[index - 1] = {
+                        Key: listing.Key,
+                        LastModified: listing.LastModified,
+                        Size: listing.Size,
+                    };
+                }
+            });
+
+            res.json({ 'Contents' : trimmedContents });
         }
     });
 });
