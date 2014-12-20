@@ -8,22 +8,25 @@ To execute, go to terminal and type:
     psql -h localhost -U postgres < init.sql
 */
 
-CREATE DATABASE IF NOT EXISTS wiiu-storage;
 \c wiiu-storage
- 
-DROP TABLE IF EXISTS users, salts;
 
-CREATE TABLE users (
+DROP TABLE IF EXISTS Users, Salts;
+
+CREATE TABLE Users (
     id SERIAL,
-    username VARCHAR(32) NOT NULL,
-    password VARCHAR NOT NULL,
+    username VARCHAR(32) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL,
+    updatedAt TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id));
 
-CREATE TABLE salts (
+CREATE TABLE Salts (
     id SERIAL,
-    userId INTEGER NOT NULL,
-    salt VARCHAR NOT NULL,
+    userId INTEGER NOT NULL UNIQUE,
+    salt VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL,
+    updatedAt TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id));
 
-INSERT INTO users (username, password) VALUES ('jordan', 'test');
-INSERT INTO salts (userId, salt) VALUES(1, 'asdasdasdasdas');
+INSERT INTO Users (username, password, createdAt, updatedAt) VALUES ('jordan', 'test', NOW(), NOW());
+INSERT INTO Salts (userId, salt, createdAt, updatedAt) VALUES(1, 'asdasdasdasdas', NOW(), NOW());
