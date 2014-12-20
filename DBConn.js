@@ -5,28 +5,28 @@ function DBConn() {
     this.authenticateUser = function(_username, _password, callback) {
         console.log('USERNAME: ' + _username + ', PASSWORD: ' + _password);
         if (!_username || !_password)
-            callback(false);
+            callback({ 'username' : _username, 'authenticated' : false });
 
         global.db.Users.find({
             where: { username:  _username },
             attributes: ['id', 'username', 'password']
         }).success(function(user) {
             if(!user)
-                callback(false);
+                callback({ 'username' : _username, 'authenticated' : false });
             else { //Found username, now get salt
                 bcrypt.compare(_password, user.password, function(err, res) {
                     if (err) {
                         debug(err);
-                        callback(false);
+                        callback({ 'username' : _username, 'authenticated' : false });
                     }
                     if (res)
-                        callback(true);
+                        callback({ 'username' : _username, 'authenticated' : true });
                     else
-                        callback(false);
+                        callback({ 'username' : _username, 'authenticated' : false });
                 });
             }
         }).failure(function() {
-            callback(false);
+            callback({ 'username' : _username, 'authenticated' : false });
         });
     };
 };

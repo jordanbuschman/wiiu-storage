@@ -6,11 +6,11 @@ var s3Conn = new S3Conn();
 var dbConn = new DBConn();
 var router = express.Router();
 
-router.post('/private/:user', function(req, res) {
-    var username = decodeURI(req.params.user);
+router.post('/authenticate', function(req, res) {
+    var username = req.body.username;
     var password = req.body.password;
     dbConn.authenticateUser(username, password, function(result) {
-        res.json({'result': result});
+        res.json({ 'username': result.username, 'authenticated' : result.authenticated });
     });
 });
 
