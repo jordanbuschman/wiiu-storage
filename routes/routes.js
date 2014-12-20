@@ -26,7 +26,6 @@ router.get('/:file', function(req, res) {
     res.render('publicItem', {title: 'Wii-U - ' + req.params.file});
 });
 
-
 router.get('/u/:user', isLoggedIn, function(req, res) {
     res.render('user', {
         title: 'Wii-U - ' + req.params.user + '\'s Files',

@@ -22,6 +22,7 @@ function S3Conn() {
             }
         });
     };
+
 };
 
 module.exports = S3Conn;
