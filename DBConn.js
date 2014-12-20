@@ -1,5 +1,5 @@
 var debug  = require('debug')('wiiu-storage:postgres');
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt');
 
 function DBConn() {
     this.authenticateUser = function(_username, _password, callback) {
@@ -14,28 +14,15 @@ function DBConn() {
             if(!user)
                 callback(false);
             else { //Found username, now get salt
-                global.db.Salts.find({
-                    where: { userid: user.id },
-                    attributes: ['salt']
-                }).success(function(salt) {
-                    if (!salt)
+                bcrypt.compare(_password, user.password, function(err, res) {
+                    if (err) {
+                        debug(err);
                         callback(false);
-                    else { //Got salt
-                        bcrypt.hash(_password, salt['salt'], null, function(err, HashAndSalt) {
-                            if (err) {
-                                debug(err);
-                                callback(false);
-                            }
-                            else { //Done hashing, now compare passwords
-                                if (HashAndSalt == user.password) //They match! Authenticated.
-                                    callback(true);
-                                else
-                                    callback(false);
-                            }
-                        });
                     }
-                }).failure(function() {
-                    callback(false);
+                    if (res)
+                        callback(true);
+                    else
+                        callback(false);
                 });
             }
         }).failure(function() {
