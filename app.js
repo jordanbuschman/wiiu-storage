@@ -12,7 +12,9 @@ var passport     = require('passport');
 var app = express();
 
 /***** ROUTES *****/
-var routes = require('./routes.js');
+var routes = require('./routes/routes.js');
+var api = require('./routes/api.js');
+app.use('/api', api);
 app.use('/', routes);
 
 /***** CONFIGURATION *****/
