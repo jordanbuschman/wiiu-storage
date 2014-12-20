@@ -4,23 +4,29 @@ var router = express.Router();
 
 router.get('/', function(req, res) {
     res.render('public', {
-        title: 'Wii-U',
+        title: 'Wii-U File Storage',
         sessionUser: req.user
     });
+});
+
+router.route('/login')
+    .get(function(req, res) {
+        res.render('login', {title: 'Wii-U - Login'});
+    })
+    .post(function(req, res) {
+        //res.render('login', {title: 'Wii-U - Login'});
+        res.redirect('/');
+    });
+
+router.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
 });
 
 router.get('/:file', function(req, res) {
     res.render('publicItem', {title: 'Wii-U - ' + req.params.file});
 });
 
-router.get('/login', function(req, res) {
-    res.render('login', {title: 'Wii-U - Login'});
-});
-
-router.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
-});
 
 router.get('/u/:user', isLoggedIn, function(req, res) {
     res.render('user', {
