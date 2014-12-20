@@ -7,7 +7,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var engine       = require('ejs-locals');
 var flash        = require('connect-flash');
-var passport     = require('passport');
 
 var app = express();
 
@@ -18,8 +17,6 @@ app.use('/api', api);
 app.use('/', routes);
 
 /***** CONFIGURATION *****/
-require('./config/passport')(passport);
-
 // view engine setup
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
@@ -39,8 +36,6 @@ app.use(session({
     saveUninitialized: true
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(flash());
 
 // catch 404 and forward to error handler
