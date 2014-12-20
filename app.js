@@ -10,26 +10,21 @@ var flash        = require('connect-flash');
 
 var app = express();
 
-/***** ROUTES *****/
-var routes = require('./routes/routes.js');
-var api = require('./routes/api.js');
-app.use('/api', api);
-app.use('/', routes);
-
 /***** CONFIGURATION *****/
+app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
 // view engine setup
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// required for passport
+// session setup
 app.use(session({
     secret: 'dont alter pl0x',
     resave: false,
@@ -37,6 +32,12 @@ app.use(session({
 }));
 
 app.use(flash());
+
+/***** ROUTES *****/
+var routes = require('./routes/routes.js');
+var api = require('./routes/api.js');
+app.use('/api', api);
+app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -68,6 +69,7 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
 
 /***** Export and start in /bin/www *****/
 module.exports = app;

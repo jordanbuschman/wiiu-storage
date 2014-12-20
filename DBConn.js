@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt-nodejs');
 
 function DBConn() {
     this.authenticateUser = function(_username, _password, callback) {
+        console.log('USERNAME: ' + _username + ', PASSWORD: ' + _password);
         if (!_username || !_password)
             callback(false);
 
