@@ -7,6 +7,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var engine       = require('ejs-locals');
 var flash        = require('connect-flash');
+var routes       = require('./routes/routes.js');
+var api          = require('./routes/api.js');
 
 var app = express();
 
@@ -34,6 +36,9 @@ app.use(session({
 app.use(flash());
 
 /***** ROUTES *****/
+app.use('/api', api);
+app.use('/', routes);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -64,11 +69,6 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
-var routes = require('./routes/routes.js');
-var api = require('./routes/api.js');
-app.use('/api', api);
-app.use('/', routes);
 
 /***** Export and start in /bin/www *****/
 module.exports = app;
