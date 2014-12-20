@@ -34,11 +34,6 @@ app.use(session({
 app.use(flash());
 
 /***** ROUTES *****/
-var routes = require('./routes/routes.js');
-var api = require('./routes/api.js');
-app.use('/api', api);
-app.use('/', routes);
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -70,6 +65,10 @@ app.use(function(err, req, res, next) {
     });
 });
 
+var routes = require('./routes/routes.js');
+var api = require('./routes/api.js');
+app.use('/api', api);
+app.use('/', routes);
 
 /***** Export and start in /bin/www *****/
 module.exports = app;
