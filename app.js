@@ -1,14 +1,15 @@
-var express = require('express');
-var session = require('express-session');
-var app = express();
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
+var express      = require('express');
+var session      = require('express-session');
+var path         = require('path');
+var favicon      = require('serve-favicon');
+var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var engine = require('ejs-locals');
-var flash = require('connect-flash');
-var passport = require('passport');
+var bodyParser   = require('body-parser');
+var engine       = require('ejs-locals');
+var flash        = require('connect-flash');
+var passport     = require('passport');
+
+var app = express();
 
 /***** ROUTES *****/
 var routes = require('./routes.js');
@@ -71,5 +72,5 @@ app.use(function(err, req, res, next) {
     });
 });
 
-
+/***** Export and start in /bin/www *****/
 module.exports = app;
