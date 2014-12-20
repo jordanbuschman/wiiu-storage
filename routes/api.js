@@ -7,14 +7,11 @@ var dbConn = new DBConn();
 var router = express.Router();
 
 router.post('/private/:user', function(req, res) {
-    console.log(req.params);
-    console.log(req.body);
-    res.send(req.body);
-    //var username = decodeURI(req.params.user);
-    //var password = req.body.password;
-    //dbConn.authenticateUser(username, password, function(result) {
-    //    res.json({'result': result});
-    //});
+    var username = decodeURI(req.params.user);
+    var password = req.body.password;
+    dbConn.authenticateUser(username, password, function(result) {
+        res.json({'result': result});
+    });
 });
 
 router.get('/', function(req, res) {
