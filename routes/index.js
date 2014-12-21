@@ -1,21 +1,24 @@
-var express = require('express');
-var router = express.Router();
+var express  = require('express');
+var passport = require('passport');
+
+var router   = express.Router();
+
+router.post('/auth', passport.authenticate('login', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}) );
 
 router.get('/', function(req, res) {
     res.render('public', {
         title: 'Wii-U File Storage',
-        sessionUser: req.user
+        message: req.flash('message')
     });
 });
 
-router.route('/login')
-    .get(function(req, res) {
-        res.render('login', {title: 'Wii-U - Login'});
-    })
-    .post(function(req, res) {
-        //res.render('login', {title: 'Wii-U - Login'});
-        res.redirect('/');
-    });
+router.get('/login', function(req, res) {
+    res.render('login', {title: 'Wii-U - Login'});
+})
 
 router.get('/logout', function(req, res) {
     req.logout();

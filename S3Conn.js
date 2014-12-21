@@ -22,6 +22,8 @@ function S3Conn() {
             }
         });
     };
+    this.listPrivateFiles = function(username, callback) {
+    };
 
 };
 

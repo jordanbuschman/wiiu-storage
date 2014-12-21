@@ -1,5 +1,7 @@
 var express      = require('express');
 var session      = require('express-session');
+var RedisStore   = require('connect-redis')(session);
+var redis        = require('redis').createClient();
 var path         = require('path');
 var favicon      = require('serve-favicon');
 var logger       = require('morgan');
@@ -7,18 +9,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var engine       = require('ejs-locals');
 var flash        = require('connect-flash');
-var routes       = require('./routes/routes.js');
-var api          = require('./routes/api.js');
+var passport     = require('passport');
 
 var app = express();
+var router = express.Router();
 
 /***** CONFIGURATION *****/
+require('./config/passport')(passport); // passport configuration
+
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // view engine setup
@@ -26,18 +29,34 @@ app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use(cookieParser('super secret session'));
+
 // session setup
 app.use(session({
-    secret: 'dont alter pl0x',
+    secret: 'super secret session',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: new RedisStore({
+        host: 'localhost',
+        port: 6379,
+        client: redis
+    })
 }));
 
-app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(require('connect-flash')({
+    host: 'localhost',
+    port: 6379,
+    app: app 
+}) );
 
 /***** ROUTES *****/
-app.use('/api', api);
-app.use('/', routes);
+var index = require('./routes/index');
+var priv  = require('./routes/private');
+app.use('/', index);
+app.use('/u', priv);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
