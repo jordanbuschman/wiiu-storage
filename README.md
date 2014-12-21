@@ -26,3 +26,6 @@ If you want to see debug messages, also add this line:
 ```
 export DEBUG="wiiu-storage"
 ```
+
+## Redis
+This system uses Redis for session info and flash messages. for local development, make sure you have a Redis server running locally on port 6379.
