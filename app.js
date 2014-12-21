@@ -1,7 +1,6 @@
 var express      = require('express');
 var session      = require('express-session');
 var RedisStore   = require('connect-redis')(session);
-var redis        = require('redis').createClient();
 var path         = require('path');
 var favicon      = require('serve-favicon');
 var logger       = require('morgan');
@@ -13,6 +12,18 @@ var passport     = require('passport');
 
 var app = express();
 var router = express.Router();
+
+var redis;
+if (process.env.REDISTOGO_URL) {
+    var rtg   = require("url").parse(process.env.REDISTOGO_URL);
+    var redis = require("redis").createClient(rtg.port, rtg.hostname);
+
+    redis.auth(rtg.auth.split(":")[1]);
+}
+else {
+    // local dev
+    redis = require('redis').createClient();
+}
 
 /***** CONFIGURATION *****/
 require('./config/passport')(passport); // passport configuration
