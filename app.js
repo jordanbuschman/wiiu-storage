@@ -4,7 +4,6 @@ var RedisStore   = require('connect-redis')(session);
 var path         = require('path');
 var favicon      = require('serve-favicon');
 var logger       = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var engine       = require('ejs-locals');
 var flash        = require('connect-flash');
@@ -23,6 +22,8 @@ if (process.env.REDISTOGO_URL) {
 else {
     // local dev
     redis = require('redis').createClient();
+    redis.debug_mode = true;
+    redis.flushdb();
 }
 
 /***** CONFIGURATION *****/
@@ -40,13 +41,14 @@ app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(cookieParser('super secret session'));
-
 // session setup
 app.use(session({
-    secret: 'super secret session',
+    secret: 'super secret message',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: { 
+        maxAge: 6000
+    },
     store: new RedisStore({
         host: 'localhost',
         port: 6379,
@@ -63,10 +65,22 @@ app.use(require('connect-flash')({
     app: app 
 }) );
 
+app.use(flash());
+
+app.use(function(req, res, next) {
+    //res.locals.authMessages = req.flash('auth-message');
+    if (res.locals)
+        console.log(res.locals.messages);
+    next();
+})
+
 /***** ROUTES *****/
 var index = require('./routes/index');
+var api   = require('./routes/api');
 var priv  = require('./routes/private');
+
 app.use('/', index);
+app.use('/api', api);
 app.use('/u', priv);
 
 // catch 404 and forward to error handler

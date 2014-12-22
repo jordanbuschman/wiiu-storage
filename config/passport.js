@@ -3,10 +3,10 @@ var Users         = require('../models/user');
 
 module.exports = function(passport) {
     passport.serializeUser(function(user, callback) {
-        callback(null, user);
+        return callback(null, user);
     });
     passport.deserializeUser(function(id, callback) {
-        callback(null, id);
+        return callback(null, id);
     });
 
     passport.use('login', new LocalStrategy(
@@ -16,17 +16,16 @@ module.exports = function(passport) {
                 attributes: ['id', 'username', 'password'],
             }).then(function(user) {
                 if (!user) {
-                    console.log('NO USER');
-                    callback(null, false, { message: 'Incorrect login information.' });
+                    return callback(null, false);
                 }
                 user.validatePassword(password, function(err, res) {
                     if (err)
-                        callback(err);
+                        return callback(err);
                     else if (res) {
-                        callback(null, user);
+                        return callback(null, [user.id, user.username, password]);
                     }
                     else {
-                        callback(null, false, { message: 'Incorrect login information.' });
+                        return callback(null, false);
                     }
                 });
             });

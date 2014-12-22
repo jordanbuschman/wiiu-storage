@@ -3,16 +3,12 @@ var passport = require('passport');
 
 var router   = express.Router();
 
-router.post('/auth', passport.authenticate('login', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}) );
-
 router.get('/', function(req, res) {
+    var message;
+
     res.render('public', {
         title: 'Wii-U File Storage',
-        message: req.flash('message')
+        message: message,
     });
 });
 
