@@ -5,8 +5,9 @@ var path         = require('path');
 var favicon      = require('serve-favicon');
 var logger       = require('morgan');
 var bodyParser   = require('body-parser');
-var engine       = require('ejs-locals');
+var cookieParser = require('cookie-parser');
 var flash        = require('connect-flash');
+var engine       = require('ejs-locals');
 var passport     = require('passport');
 
 var app = express();
@@ -33,6 +34,7 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser('super secret'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -46,9 +48,6 @@ app.use(session({
     secret: 'super secret message',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-        maxAge: 6000
-    },
     store: new RedisStore({
         host: 'localhost',
         port: 6379,
@@ -56,23 +55,10 @@ app.use(session({
     })
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(require('connect-flash')({
-    host: 'localhost',
-    port: 6379,
-    app: app 
-}) );
-
 app.use(flash());
 
-app.use(function(req, res, next) {
-    //res.locals.authMessages = req.flash('auth-message');
-    if (res.locals)
-        console.log(res.locals.messages);
-    next();
-})
+app.use(passport.initialize());
+app.use(passport.session());
 
 /***** ROUTES *****/
 var index = require('./routes/index');

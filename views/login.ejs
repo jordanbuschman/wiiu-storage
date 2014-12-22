@@ -1,5 +1,9 @@
 <% layout('boilerplate') -%>
 <% block('title', title) %>
 
+<% if (error) { %>
+    <p class="error"><%= error %></p>
+<% } %>
+
 <h4>Login</h4>
 <% include login-modal %>

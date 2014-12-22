@@ -4,17 +4,21 @@ var passport = require('passport');
 var router   = express.Router();
 
 router.get('/', function(req, res) {
-    var message;
-
     res.render('public', {
         title: 'Wii-U File Storage',
-        message: message,
+        loggedIn: req.isAuthenticated(),
+        user: (req.isAuthenticated() ? req.user.name : false),
+        message: 'meow'
     });
 });
 
 router.get('/login', function(req, res) {
-    res.render('login', {title: 'Wii-U - Login'});
-})
+    var error = req.flash('error');
+    res.render('login', {
+        title: 'Wii-U - Login',
+        error: (error ? error : false)
+    });
+});
 
 router.get('/logout', function(req, res) {
     req.logout();
