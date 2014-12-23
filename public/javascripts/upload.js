@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    status('Choose a file :)');
+    status('Select a file to upload.');
 
     // Check to see when a user has selected a file                                                                                                                
     var timerId;
@@ -12,7 +12,7 @@ $(document).ready(function() {
     }, 500);
 
     $('#uploadForm').submit(function() {
-        status('uploading the file ...');
+        status('Uploading file ...');
 
         $(this).ajaxSubmit({                                                                                                                 
             error: function(xhr) {
@@ -20,7 +20,7 @@ $(document).ready(function() {
             },
 
             success: function(response) {
-                //TODO: We will fill this in later
+                status('Upload complete!');
             }
         });
         return false;
