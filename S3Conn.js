@@ -37,18 +37,16 @@ function S3Conn() {
             if (err)
                 return callback(err);
 
-            var iv, encryptedFile, hmacKey, hmac, fileToSend;
-
             derivedKey = derivedKey.toString('hex');
 
-            iv = new Buffer(crypto.randomBytes(16));
-            encryptedFile = crypto.createCipheriv('AES-128-CBC', derivedKey, iv).update(file, 'binary', 'hex');
+            var iv = new Buffer(crypto.randomBytes(16));
+            var encryptedFile = crypto.createCipheriv('AES-128-CBC', derivedKey, iv).update(file, 'binary', 'hex');
 
-            hmacKey = crypto.randomBytes(32);
-            hmac = crypto.createHmac('SHA256', hmacKey).update(encryptedFile).update(iv.toString('hex')).digest('hex');
+            var hmacKey = crypto.randomBytes(32);
+            var hmac = crypto.createHmac('SHA256', hmacKey).update(encryptedFile).update(iv.toString('hex')).digest('hex');
 
-            fileToSend = salt.toString('hex') + iv.toString('hex') + hmac.toString('hex') + encryptedFile.toString('hex');
-            //size(hex):       64                    32                     32                         varies 
+            var fileToSend = salt.toString('hex') + iv.toString('hex') + hmac.toString('hex') + encryptedFile.toString('hex');
+            //  size(hex):         64                    32                     64                         varies 
 
             //Now that encryption is done, upload it to S3
             options['ContentLength'] = fileToSend.length;
@@ -62,6 +60,9 @@ function S3Conn() {
                 return callback(data);            
             });
         });
+    };
+
+    this.getPrivateFile = function(username, password, filename, salt, callback) {
     };
 };
 
