@@ -8,6 +8,7 @@ var bodyParser   = require('body-parser');
 var cookieParser = require('cookie-parser');
 var flash        = require('connect-flash');
 var engine       = require('ejs-locals');
+var busboy       = require('connect-busboy');
 var passport     = require('passport');
 
 var app = express();
@@ -56,6 +57,7 @@ app.use(session({
 }));
 
 app.use(flash());
+app.use(busboy());
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -27,6 +27,8 @@
     "passport": "~0.2.1",
     "redis": "~0.12.1",
     "connect-flash-redis": "~1.0.2",
-    "connect-flash": "~0.1.1"
+    "connect-flash": "~0.1.1",
+    "crypto": "0.0.3",
+    "connect-busboy": "0.0.2"
   }
 }

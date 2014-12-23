@@ -1,8 +1,7 @@
-var bcrypt = require('bcrypt');
 var crypto = require('crypto');
 
 module.exports = function(sequelize, DataTypes) {
-    return sequelize.define('Salt', {
+    return sequelize.define('Salts', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -10,7 +9,6 @@ module.exports = function(sequelize, DataTypes) {
         },
         userId: {
             type: DataTypes.INTEGER,
-            unique: true,
             allowNull: false,
         },
         fileName: {
@@ -19,18 +17,18 @@ module.exports = function(sequelize, DataTypes) {
             allowNull: false,
         },
         salt: {
-            type: DataTypes.STRING(32),
+            type: DataTypes.STRING(64),
             allowNull: false,
         },
     }, {
-        instanceMethods: {
+        classMethods: {
             genSalt: function(callback) {
-                crypto.randomBytes(32, function(err, salt) {
+                crypto.randomBytes(32, function(err, buf) {
                     if (err)
                         return callback(err);
-                    return callback(null, salt);
+                    return callback(null, buf.toString('hex'));
                 });
             },
-        }
+        },
     });
 };

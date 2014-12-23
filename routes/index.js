@@ -32,24 +32,29 @@ router.get('/:file', function(req, res) {
 router.get('/u/:user', isLoggedIn, function(req, res) {
     res.render('user', {
         title: 'Wii-U - ' + req.params.user + '\'s Files',
-        sessionUser: req.user,
-        user: req.param.user
     });
 });
 
+router.get('/u/:user/upload', isLoggedIn, function(req, res) {
+    res.render('upload', {
+        title: 'Wii-U - Upload file',
+        user: req.user
+    });
+});
 router.get('/u/:user/:file', isLoggedIn, function(req, res) {
     res.render('userItem', {
         title: 'Wii-U - ' + req.params.file,
-        sessionUser: req.user,
-        user: req.param.user
+        user: req.user
     }); 
 });
     
 function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
+    if (req.isAuthenticated() && req.user[1] == req.params.user)
         return next();
 
-    res.redirect('/');
+    res.status('403').render('forbidden', {
+        title: 'Wii-U - Forbidden'
+    });
 }
 
 module.exports = router;

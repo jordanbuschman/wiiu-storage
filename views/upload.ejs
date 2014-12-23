@@ -1,0 +1,14 @@
+<% layout('boilerplate') -%>
+<% block('title', title) %>
+
+<% script('/javascripts/jquery.form.js') %>
+<% script('/javascripts/upload.js') %>
+
+<h4>Wii-U File Storage - Upload files</h4>
+
+<form id="uploadForm" enctype="multipart/form-data" action="/api/u/<%= user[1] %>/upload" method="post">
+    <input type="file" id="userPhotoInput" name="userPhoto" />
+</form>
+
+<span id="status" />
+<img id="uploadedImage" />
