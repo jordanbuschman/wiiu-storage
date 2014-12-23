@@ -11,7 +11,7 @@ To execute, go to terminal and type:
 -- Uncomment for local usage
 --\c wiiu-storage
 
-DROP TABLE IF EXISTS "Users";
+DROP TABLE IF EXISTS "Users", "Salts";
 
 CREATE TABLE "Users" (
     id SERIAL,
@@ -20,3 +20,12 @@ CREATE TABLE "Users" (
     "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id));
+
+CREATE TABLE "Salts" (
+    id SERIAL,
+    "userId" INTEGER NOT NULL UNIQUE,
+    "fileName" VARCHAR(255) NOT NULL UNIQUE,
+    salt VARCHAR(32) NOT NULL,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY(id));
