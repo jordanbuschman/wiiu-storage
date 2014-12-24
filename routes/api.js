@@ -103,7 +103,7 @@ router.get('/u/:user/:file', isLoggedIn, function(req, res) {
 });
 
 router.get('/', function(req, res) {
-    res.redirect('/api/public');
+    return res.redirect('/api/public');
 });
 
 router.get('/public', function(req, res) {

@@ -67,9 +67,9 @@ var index = require('./routes/index');
 var api   = require('./routes/api');
 var priv  = require('./routes/private');
 
-app.use('/', index);
 app.use('/api', api);
 app.use('/u', priv);
+app.use('/', index);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
