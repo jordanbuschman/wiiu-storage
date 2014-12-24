@@ -79,7 +79,7 @@ router.post('/u/:user/upload', isLoggedIn, function(req, res, next) {
 router.get('/u/:user/:file', isLoggedIn, function(req, res) {
     var username = req.user[1];
     var password = req.user[2];
-    var filename = req.params.file;
+    var filename = decodeURI(req.params.file);
 
     global.db.Files.findOne({
         where: { 'userId': req.user[0], 'fileName': filename },
@@ -106,32 +106,18 @@ router.get('/', function(req, res) {
 });
 
 router.get('/public', function(req, res) {
-    s3Conn.listPublicFiles(function(e, data) {
-        if (e) {
-            res.json({'ERROR' : e });
-        }
-        else {
-            var contents = data.Body.ListBucketResult.Contents;
-            var trimmedContents = [];
-            contents.forEach(function(listing, index) {
-                if (index != 0) {
-                    trimmedContents[index - 1] = {
-                        Key: listing.Key,
-                        LastModified: listing.LastModified,
-                        Size: listing.Size,
-                    };
-                }
-            });
-
-            res.json({ 'Contents' : trimmedContents });
-        }
+    s3Conn.listPublicFiles(function(data) {
+        console.log(data);
+        res.status(data.StatusCode).send(data.Body);
     });
 });
 
 router.get('/public/:file', function(req, res) {
     var file = decodeURI(req.params.file);
-    file = file.replace(/^\/|[\?<>\\:\*\|":\x00-\x1f\x80-\x9f]/g, '');
-    res.json(file);
+    
+    s3Conn.getPublicFile(file, function(data) {
+        res.status(data.StatusCode).send(data.Body);
+    });
 });
 
 function isLoggedIn(req, res, next) {

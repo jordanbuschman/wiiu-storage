@@ -16,11 +16,11 @@ function S3Conn() {
         };
 
         s3.ListObjects(options, function(err, data) {
-            if (err != null) {
-                callback(err, null);
+            if (err) {
+                return callback(err);
             }
             else {
-                callback(null, data);
+                return callback(data);
             }
         });
     };
@@ -51,33 +51,33 @@ function S3Conn() {
             hmac.end(iv.concat(encryptedFile), function() {
                 var hmacString = hmac.read();
 
-                console.log('SALT: ' + salt + ' (' + salt.length +')');
-                console.log('IV: ' + iv + ' (' + iv.length + ')');
-                console.log('HMAC: ' + hmacString + ' (' + hmacString.length + ')');
-                console.log('FILE LENGTH: ' + encryptedFile.length);
-
-
                 var fileToSend = salt.concat(iv, hmacString, encryptedFile);
                 //  size(hex):    64         16     64           varies 
-                console.log('FINAL LENGTH: ' + fileToSend.length);
-                console.log('NEW SALT: ' + fileToSend.slice(0, 64));
-                console.log('NEW IV: ' + fileToSend.slice(64, 80));
-                console.log('NEW HMAC: ' + fileToSend.slice(80, 144));
 
                 //Now that encryption is done, upload it to S3
                 options['ContentLength'] = fileToSend.length;
                 options['Body'] = fileToSend;
 
                 s3.PutObject(options, function(err, data) {
-                    if (err) {
-                        console.log(err);
+                    if (err)
                         return callback(err);
-                    }
-                    console.log(data);
+
                     return callback(data);            
                 });
             });
-            //});
+        });
+    };
+
+    this.getPublicFile = function(filename, callback) {
+        var options = {
+            BucketName: 'jbfilespace',
+            ObjectName: 'public/' + filename,
+        };
+
+        s3.GetObject(options, function(err, data) {
+            if (err)
+                return callback(err);
+            return callback(data);
         });
     };
 
@@ -97,11 +97,6 @@ function S3Conn() {
             var iv = String(file.slice(64, 80));
             var hmac = String(file.slice(80, 144));
             var encryptedFile = String(file.slice(144, file.length));
-
-            console.log('SALT: ' + salt);
-            console.log('IV: ' + iv);
-            console.log('HMAC: ' + hmac);
-            console.log('FILE LENGTH: ' + file.length);
 
             crypto.pbkdf2(password, salt, 80000, 8, function(err, derivedKey) {
                 if (err)
