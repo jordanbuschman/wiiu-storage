@@ -50,6 +50,7 @@ router.post('/u/:user/upload', isLoggedIn, function(req, res, next) {
                 if (fileData) { //File already exists, conflict error
                     return res.status(409).send();
                 }
+                //TODO: Upload is super slow, either give users an option to encrypt or remove completely
                 global.db.Files.generateRandomBytes(function(err, rand) {
                     if (err)
                         return next(err);
@@ -107,8 +108,24 @@ router.get('/', function(req, res) {
 
 router.get('/public', function(req, res) {
     s3Conn.listPublicFiles(function(data) {
-        console.log(data);
-        res.status(data.StatusCode).send(data.Body);
+        if (data.StatusCode != 200)
+            return res.status(data.StatusCode).send(data.Body);
+
+        var completeContents = data.Body.ListBucketResult.Contents;
+        var contents = {'Contents': new Array()};
+        for (content in completeContents) {
+            if (completeContents[content].Size == 0)
+                continue;
+
+            contents.Contents.push({
+                'Key': completeContents[content].Key,
+                'LastModified': completeContents[content].LastModified,
+                'Size': completeContents[content].Size,
+                'URL': '/api/' + completeContents[content].Key
+            });
+        }
+        return res.status(data.StatusCode).send(contents);
+
     });
 });
 
