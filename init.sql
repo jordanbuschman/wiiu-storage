@@ -12,7 +12,7 @@ To execute, go to terminal and type:
 --\c wiiu-storage
 
 DROP TABLE IF EXISTS "Users";
-DROP TABLE IF EXISTS "Salts";
+DROP TABLE IF EXISTS "Files";
 
 CREATE TABLE "Users" (
     id SERIAL,
@@ -22,11 +22,12 @@ CREATE TABLE "Users" (
     "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id));
 
-CREATE TABLE "Salts" (
+CREATE TABLE "Files" (
     id SERIAL,
     "userId" INTEGER NOT NULL,
     "fileName" VARCHAR(255) NOT NULL UNIQUE,
     salt VARCHAR(64) NOT NULL,
+    "hmacKey" VARCHAR(64) NOT NULL,
     "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY(id));

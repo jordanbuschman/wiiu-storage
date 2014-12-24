@@ -1,5 +1,6 @@
 var express  = require('express');
 var passport = require('passport');
+var fs       = require('fs');
 var S3Conn   = require('../S3Conn');
 
 var router = express.Router();
@@ -35,35 +36,39 @@ router.post('/u/:user/upload', isLoggedIn, function(req, res, next) {
     req.pipe(req.busboy);
 
     req.busboy.on('file', function (fieldname, file, filename) {
-        var fileContents;
+        var dataBuffer = new Buffer('');
+
         file.on('data', function(data) {
-            fileContents += data;
+            dataBuffer = Buffer.concat([dataBuffer, data]);
         });
 
         file.on('end', function() {
-            global.db.Salts.findOne({
+            global.db.Files.findOne({
                 where: { userId: req.user[0], fileName: filename },
-                attributes: ['id', 'userId', 'fileName', 'salt'],
-            }).then(function(salt) {
-                if (salt) { //File already exists, conflict error
+                attributes: ['id', 'userId', 'fileName', 'salt', 'hmacKey'],
+            }).then(function(fileData) {
+                if (fileData) { //File already exists, conflict error
                     return res.status(409).send();
                 }
-                global.db.Salts.genSalt(function(err, newSalt) {
+                global.db.Files.generateRandomBytes(function(err, rand) {
                     if (err)
                         return next(err);
 
-                    global.db.Salts.create({
+                    global.db.Files.create({
                         'userId': req.user[0],
                         'fileName': filename,
-                        'salt': newSalt
-                    }).then(function(salt) {
-                        if (!salt) //Insertion went wrong
+                        'salt': rand[0],
+                        'hmacKey': rand[1],
+                    }).then(function(newFileData) {
+                        if (!newFileData) //Insertion went wrong
                             return res.status(500).send();
-                        //If here, that means that the salt was created successfully. Encrypt and upload to S3.
-                        s3Conn.uploadPrivateFile(req.user[1], req.user[2], filename, salt.salt, fileContents, function(result) {
-                            console.log(result.StatusCode);
-                            return res.status(result.StatusCode).send();
-                        })
+                        //If here, that means that the file data was created successfully. Encrypt and upload to S3.
+                        s3Conn.uploadPrivateFile(req.user[1], req.user[2], filename, newFileData.salt, newFileData.hmacKey, dataBuffer, function(result) {
+                            if (result.StatusCode)
+                                return res.status(result.StatusCode).send();
+                            else
+                                return res.status(500).send(JSON.stringify(result));
+                        });
                     });
                 });
             });
@@ -71,15 +76,29 @@ router.post('/u/:user/upload', isLoggedIn, function(req, res, next) {
     });
 });
 
-router.post('/private/:user/:file', function(req, res) {
-    var username = decodeURI(req.params.user);
-    var filename = decodeURI(req.params.file);
-    var password = req.body.password;
+router.get('/u/:user/:file', isLoggedIn, function(req, res) {
+    var username = req.user[1];
+    var password = req.user[2];
+    var filename = req.params.file;
 
-    if (req.isAuthenticated() && req.user.username == username) 
-        res.status(200).send();
-    else
-        res.status(401).send();
+    global.db.Files.findOne({
+        where: { 'userId': req.user[0], 'fileName': filename },
+        attributes: ['id', 'fileName', 'hmacKey']
+    }).then(function(newFile) {
+        if (!newFile) //File does not exist
+            return res.status(404).render('error');
+        
+        s3Conn.getPrivateFile(username, password, newFile.fileName, newFile.hmacKey, function(result) {
+            if (result.StatusCode == 200) {
+                res.status(result.StatusCode);
+                res.set('Content-Type', 'image/jpg');
+                res.send(result.Body);
+            }
+            else
+                return res.status(500).send(JSON.stringify(result));
+        });
+    });
+
 });
 
 router.get('/', function(req, res) {
@@ -119,7 +138,7 @@ function isLoggedIn(req, res, next) {
     if (req.isAuthenticated() && req.user[1] == req.params.user)
         return next();
 
-    res.status('403').render('forbidden', {
+    return res.status('403').render('forbidden', {
         title: 'Wii-U - Forbidden'
     });
 }

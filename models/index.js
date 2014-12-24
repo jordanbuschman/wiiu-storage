@@ -30,7 +30,7 @@ if (!global.hasOwnProperty('db')) {
         Sequelize: Sequelize,
         sequelize: sequelize,
         Users: sequelize.import(__dirname + '/user'),
-        Salts: sequelize.import(__dirname + '/salt'),
+        Files: sequelize.import(__dirname + '/file'),
     };
 }
 
